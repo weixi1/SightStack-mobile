@@ -1,1 +1,0 @@
-# SightStack-mobile
