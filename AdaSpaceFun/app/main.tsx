@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Link, useRouter } from 'expo-router'; // 使用 Expo Router 的导航工具
 
 interface Grade {
   label: string;
@@ -8,7 +8,7 @@ interface Grade {
 }
 
 const MainHome: React.FC = () => {
-  const navigation = useNavigation();
+  const router = useRouter(); // 使用 useRouter 钩子
 
   const grades: Grade[] = [
     { label: "Pre-K", className: "pre-k" },
@@ -22,11 +22,11 @@ const MainHome: React.FC = () => {
   ];
 
   const navigateToDailyGame = () => {
-    navigation.navigate('DailyGame');
+    router.push('/daily-game'); // 使用 router.push 导航到每日游戏页面
   };
 
   const navigateToGame = (grade: string) => {
-    navigation.navigate('Game', { grade });  // 跳转到相应年级的游戏页面
+    router.push({ pathname: '/game', params: { grade } }); // 导航到游戏页面并传递参数
   };
 
   return (
