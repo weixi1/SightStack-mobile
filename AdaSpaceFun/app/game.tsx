@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import Popup from './popup';
 
@@ -138,6 +135,16 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
     router.back();
   };
 
+  // Function to handle letter click
+  const handleLetterClick = (letter: string) => {
+    const emptyIndex = answer.findIndex((char) => char === '');
+    if (emptyIndex !== -1) {
+      const newAnswer = [...answer];
+      newAnswer[emptyIndex] = letter;
+      setAnswer(newAnswer);
+    }
+  };
+
   // Start the game when the component mounts
   useEffect(() => {
     startGame();
@@ -161,7 +168,11 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
           <>
             <View style={styles.puzzle}>
               {shuffledWord.map((letter, index) => (
-                <TouchableOpacity key={index} style={styles.draggable}>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.letter}
+                  onPress={() => handleLetterClick(letter)}
+                >
                   <Text>{letter}</Text>
                 </TouchableOpacity>
               ))}
@@ -230,7 +241,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 20,
   },
-  draggable: {
+  letter: {
     padding: 15,
     backgroundColor: '#ff8c00',
     borderRadius: 10,
