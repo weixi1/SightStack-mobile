@@ -15,7 +15,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        headerShown: false, // Show the header on all screens
+        // headerTitleAlign: 'center',
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
@@ -34,9 +36,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="rules"
         options={{
-          title: 'Explore',
+          title: 'Rules',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
