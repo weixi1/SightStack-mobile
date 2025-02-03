@@ -267,6 +267,7 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 16,
     color: '#0066cc',
+    fontWeight: 'bold',
   },
   mainArea: {
     flex: 1,
@@ -278,6 +279,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 20,
     justifyContent: 'center',
+    fontWeight: 'bold',
   },
   letter: {
     padding: 15,
@@ -290,6 +292,7 @@ const styles = StyleSheet.create({
   letterText: {
     fontSize: 18,
     color: '#fff',
+    fontWeight: 'bold',
   },
   placeholders: {
     flexDirection: 'row',
@@ -311,6 +314,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 18,
     color: '#0066cc',
+    fontWeight: 'bold',
   },
   hintButton: {
     padding: 15,
