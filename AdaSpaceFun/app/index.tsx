@@ -11,29 +11,43 @@ const app = () => {
         style={styles.image}
         >
         <Text style={styles.title}>AdaSpaceFun</Text>
-        <Link href="/rules" style={{marginHorizontal:'auto'}} asChild>
-        <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Rules</Text>
-        </Pressable>
-        </Link>
+        <View style={styles.buttonContainer}>
+            <Link href="/rules" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Rules</Text>
+            </Pressable>
+            </Link>
 
-        <Link href="/signup" style={{marginHorizontal:'auto'}} asChild>
-        <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-        </Pressable>
-        </Link>
+            <Link href="/main" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Game</Text>
+            </Pressable>
+            </Link>
 
-        <Link href="/login" style={{marginHorizontal:'auto'}} asChild>
-        <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Log In</Text>
-        </Pressable>
-        </Link>
+            <Link href="/signup" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+            </Pressable>
+            </Link>
 
-        <Link href="/main" style={{marginHorizontal:'auto'}} asChild>
-        <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Game</Text>
-        </Pressable>
-        </Link>
+            <Link href="/login" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Log In</Text>
+            </Pressable>
+            </Link>
+
+            <Link href="/account" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Account</Text>
+            </Pressable>
+            </Link>
+
+            <Link href="/leaderboard" style={{marginHorizontal:'auto'}} asChild>
+            <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>Leaderboard</Text>
+            </Pressable>
+            </Link>
+        </View>
         </ImageBackground>
     </View>
   )
@@ -51,7 +65,6 @@ const styles = StyleSheet.create({
         height: '100%',
         flex: 1,
         justifyContent: 'center',
-
     },
     title:{
         fontSize: 42,
@@ -60,15 +73,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 120,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     button:{
         height: 60,
-        width: 150,
+        width: 200,
         borderRadius: 20,
         justifyContent: 'center',
-        backgroundColor:'rgba(0,0,0,0.75)',
+        backgroundColor:'rgba(0,0,0,0.5)',
         padding: 6,
-        marginBottom: 20,
-
+        margin: 10, // 调整按钮之间的间距
     },
     buttonText: {
         fontSize: 16,

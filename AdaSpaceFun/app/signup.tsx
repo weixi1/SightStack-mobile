@@ -19,7 +19,6 @@ const SignUp = () => {
     require('@/assets/images/avatar4.jpg'),
     require('@/assets/images/avatar5.jpg'),
     require('@/assets/images/avatar6.jpg'),
-    require('@/assets/images/avatar7.jpg'),
     require('@/assets/images/avatar8.jpg'),
     require('@/assets/images/avatar9.jpg'),
   ];

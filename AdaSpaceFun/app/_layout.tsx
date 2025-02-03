@@ -37,6 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="signup" options={{ headerShown: true, title: "SignUp", headerTitle:"Sign Up"}} />
         <Stack.Screen name="login" options={{ headerShown: true, title: "LogIn", headerTitle:"Log In"}} />
         <Stack.Screen name="main" options={{ headerShown: true, title: "Game", headerTitle:"Game"}} />
+        <Stack.Screen name="account" options={{ headerShown: true, title: "Account", headerTitle:"Account"}} />
         <Stack.Screen name="+not-found" />
         </Stack>
 
