@@ -1,7 +1,21 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 const Rules: React.FC = () => {
+    const [isDescriptionVisible1, setDescriptionVisible1] = useState<boolean>(false);
+    const [isDescriptionVisible2, setDescriptionVisible2] = useState<boolean>(false);
+    const [isDescriptionVisible3, setDescriptionVisible3] = useState<boolean>(false);
+
+    const toggleDescription1 = () => {
+        setDescriptionVisible1(!isDescriptionVisible1);
+    };
+    const toggleDescription2 = () => {
+        setDescriptionVisible2(!isDescriptionVisible2);
+    };
+    const toggleDescription3 = () => {
+        setDescriptionVisible3(!isDescriptionVisible3);
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.header}>Game Rules</Text>
@@ -10,21 +24,42 @@ const Rules: React.FC = () => {
                     <Text style={styles.icon}>🐣</Text>
                     <View style={styles.textContainer}>
                         <Text style={styles.text}>Pick Your Grade 🎓</Text>
-                        <Text style={styles.description}>Tap to choose your grade level and get ready to play!</Text>
+                        <TouchableOpacity onPress={toggleDescription1}>
+                            <Text style={styles.description}>
+                                {isDescriptionVisible1 ? 'Tap to hide description' : 'Tap to show description'}
+                            </Text>
+                        </TouchableOpacity>
+                        {isDescriptionVisible1 && (
+                            <Text style={styles.description}>Tap to choose your grade level and get ready to play!</Text>
+                        )}
                     </View>
                 </View>
                 <View style={styles.listItem}>
                     <Text style={styles.icon}>🧩</Text>
                     <View style={styles.textContainer}>
                         <Text style={styles.text}>Fix the Word</Text>
-                        <Text style={styles.description}>Drag and drop the scrambled letters to put them in the correct order and make a word. You can do it!</Text>
+                        <TouchableOpacity onPress={toggleDescription2}>
+                            <Text style={styles.description}>
+                                {isDescriptionVisible2 ? 'Tap to hide description' : 'Tap to show description'}
+                            </Text>
+                        </TouchableOpacity>
+                        {isDescriptionVisible2 && (
+                            <Text style={styles.description}>Drag and drop the scrambled letters to put them in the correct order and make a word. You can do it!</Text>
+                        )}
                     </View>
                 </View>
                 <View style={styles.listItem}>
                     <Text style={styles.icon}>⭐</Text>
                     <View style={styles.textContainer}>
                         <Text style={styles.text}>Daily Game Mode</Text>
-                        <Text style={styles.description}>Want a quick challenge? Try the Daily Game! You can even play across different grade levels—how many can you solve? 🎉</Text>
+                        <TouchableOpacity onPress={toggleDescription3}>
+                            <Text style={styles.description}>
+                                {isDescriptionVisible3 ? 'Tap to hide description' : 'Tap to show description'}
+                            </Text>
+                        </TouchableOpacity>
+                        {isDescriptionVisible3 && (
+                            <Text style={styles.description}>Want a quick challenge? Try the Daily Game! You can even play across different grade levels—how many can you solve? 🎉</Text>
+                        )}
                     </View>
                 </View>
             </View>
@@ -42,7 +77,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#003366',
     },
     header: {
-        fontSize: 28,
+        fontSize: 25,
         fontWeight: 'bold', // 加粗
         color: '#fff',
         marginBottom: 30,
@@ -71,17 +106,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        fontSize: 20,
+        fontSize: 15,
         fontWeight: 'bold', // 加粗
         color: '#333',
     },
     description: {
-        fontSize: 18,
+        fontSize: 14,
         color: '#444',
         marginTop: 5,
     },
     footer: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold', // 加粗
         color: '#fff',
         marginTop: 30,
