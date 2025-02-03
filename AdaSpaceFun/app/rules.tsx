@@ -63,7 +63,7 @@ const Rules: React.FC = () => {
                     </View>
                 </View>
             </View>
-            <Text style={styles.footer}>Have fun and show us how smart you are! ✨</Text>
+            <Text style={styles.footer}>Show us how smart you are! ✨</Text>
         </ScrollView>
     );
 };
