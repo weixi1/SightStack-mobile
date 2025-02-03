@@ -22,7 +22,7 @@ const MainHome: React.FC = () => {
   ];
 
   const navigateToDailyGame = () => {
-    router.push('/daily-game'); // 使用 router.push 导航到每日游戏页面
+    router.push({ pathname: '/game', params: { type: 'daily' } });
   };
 
   const navigateToGame = (grade: string) => {

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useRouter } from 'expo-router'; // Importing useRouter from expo-router
-import Popup from './popup'; // You need to implement a React Native version of Popup component
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { Audio } from 'expo-av';
+import { useRouter } from 'expo-router';
+import Popup from './popup';
 
 interface Word {
   word: string;
@@ -10,8 +13,8 @@ interface Word {
 }
 
 interface GameProps {
-  type: 'daily' | 'grade';
-  grade?: string;
+  type?: 'daily' | 'grade'; // Make type optional with default value
+  grade?: string; // Make grade optional
 }
 
 const wordLibrary: Word[] = [
@@ -28,19 +31,6 @@ const wordLibrary: Word[] = [
   { word: "star", hint: "A luminous point in the night sky", level: "prek" },
   { word: "ball", hint: "A spherical object used in games and sports", level: "prek" },
   { word: "bird", hint: "A warm-blooded egg-laying vertebrate animal with wings", level: "prek" },
-  { word: "school", hint: "A place where children go to learn", level: "2nd grade" },
-  { word: "family", hint: "A group of people related by blood or marriage", level: "2nd grade" },
-  { word: "friend", hint: "A person you like and trust", level: "2nd grade" },
-  { word: "water", hint: "A clear liquid that all living things need to survive", level: "2nd grade" },
-  { word: "happy", hint: "Feeling or showing pleasure or joy", level: "2nd grade" },
-  { word: "light", hint: "Something that makes things visible or bright", level: "2nd grade" },
-  { word: "apple", hint: "A round fruit that is red, green, or yellow", level: "2nd grade" },
-  { word: "paper", hint: "Material used for writing or drawing on", level: "2nd grade" },
-  { word: "plant", hint: "A living thing that grows in soil and has leaves and roots", level: "2nd grade" },
-  { word: "house", hint: "A building where people live", level: "2nd grade" },
-  { word: "tiger", hint: "A large wild cat with orange fur and black stripes", level: "2nd grade" },
-  { word: "clock", hint: "A device that shows the time", level: "2nd grade" },
-  { word: "music", hint: "Sounds that are sung or played and that people enjoy", level: "2nd grade" }
 ];
 
 const gradeToLevel = (grade: string): string => {
@@ -53,11 +43,11 @@ const gradeToLevel = (grade: string): string => {
     case 'grade-4': return '4th';
     case 'grade-5': return '5th';
     case 'grade-6': return '6th';
-    default: return 'prek';
+    default: return 'prek'; // Default to prek if grade is invalid
   }
 };
 
-const Game: React.FC<GameProps> = ({ type, grade }) => {
+const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [shuffledWord, setShuffledWord] = useState<string[]>([]);
@@ -68,27 +58,47 @@ const Game: React.FC<GameProps> = ({ type, grade }) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
 
+  // Function to start the game
   const startGame = async () => {
     try {
       let randomWord: Word;
+
       if (type === 'daily') {
+        // Randomly select a word from the wordLibrary for daily game
         randomWord = wordLibrary[Math.floor(Math.random() * wordLibrary.length)];
-      } else if (grade) {
+      } else if (type === 'grade') {
+        // Ensure grade is provided for grade-based game
+        if (!grade) {
+          throw new Error('Grade is required for grade-based game');
+        }
+
+        // Filter words based on the grade level
         const level = gradeToLevel(grade);
-        randomWord = wordLibrary.filter(word => word.level === level)[Math.floor(Math.random() * wordLibrary.filter(word => word.level === level).length)];
+        const filteredWords = wordLibrary.filter(word => word.level === level);
+
+        if (filteredWords.length === 0) {
+          throw new Error(`No words found for grade: ${grade}`);
+        }
+
+        randomWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
       } else {
-        throw new Error('Grade level is required for grade-specific games');
+        throw new Error('Invalid game type');
       }
+
       setCurrentWord(randomWord);
       const shuffled = shuffleArray(randomWord.word.split(''));
       setShuffledWord(shuffled);
       setAnswer(Array(shuffled.length).fill(''));
       setShowHint(false);
+      setIsCompleted(false);
     } catch (err) {
       console.error('Failed to start game:', err);
+      setPopupMessage(err.message || 'Error starting the game.');
+      setIsPopupOpen(true);
     }
   };
 
+  // Function to shuffle an array
   const shuffleArray = (array: string[]) => {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -97,10 +107,12 @@ const Game: React.FC<GameProps> = ({ type, grade }) => {
     return array;
   };
 
+  // Function to reset the answer
   const handleReplay = () => {
     setAnswer(Array(answer.length).fill(''));
   };
 
+  // Function to handle submission
   const handleSubmit = async () => {
     if (currentWord && answer.join('') === currentWord.word) {
       setScore(score + 1);
@@ -121,9 +133,15 @@ const Game: React.FC<GameProps> = ({ type, grade }) => {
     }
   };
 
+  // Function to go back to the home screen
   const goBackToHome = () => {
     router.back();
   };
+
+  // Start the game when the component mounts
+  useEffect(() => {
+    startGame();
+  }, [type, grade]);
 
   return (
     <View style={styles.container}>
