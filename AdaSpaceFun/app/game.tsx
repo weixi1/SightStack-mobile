@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // 使用 Ionicons 图标库
 import * as Speech from 'expo-speech'; // 导入 expo-speech
 import { Audio } from 'expo-av'; // 导入 expo-av 用于请求权限
 import Popup from './popup';
+import background from '@/assets/images/background.jpg'; // 导入背景图
 
 interface Word {
   word: string;
@@ -169,71 +170,77 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   }, [type, grade]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={startGame} style={styles.button}>
-          <Text>{isCompleted ? 'New Game' : 'Play'}</Text>
-        </TouchableOpacity>
-        <View style={styles.scoreDisplay}>
-          <Text>Score: {score}</Text>
+    <ImageBackground source={background} style={styles.background}>
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={startGame} style={styles.button}>
+            <Text style={styles.buttonText}>{isCompleted ? 'New Game' : 'Play'}</Text>
+          </TouchableOpacity>
+          <View style={styles.scoreDisplay}>
+            <Text style={styles.scoreText}>Score: {score}</Text>
+          </View>
+          <TouchableOpacity onPress={goBackToHome} style={styles.button}>
+            <Text style={styles.buttonText}>Exit</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={goBackToHome} style={styles.button}>
-          <Text>Exit</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={styles.mainArea}>
-        {currentWord && (
-          <>
-            <View style={styles.puzzle}>
-              {shuffledWord.map((letter, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.letter}
-                  onPress={() => handleLetterClick(letter)}
-                >
-                  <Text>{letter}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.placeholders}>
-              {answer.map((letter, index) => (
-                <TouchableOpacity key={index} style={styles.placeholder}>
-                  <Text>{letter}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity onPress={() => setShowHint(!showHint)} style={styles.button}>
-              <Text>{showHint ? 'Hide Hint' : 'Show Hint'}</Text>
-            </TouchableOpacity>
-            {showHint && (
-              <View style={styles.hintsSection}>
-                <Text>Hint: {currentWord.hint}</Text>
-                <TouchableOpacity onPress={playSound} style={styles.speakerIcon}>
-                  <Ionicons name="volume-high" size={24} color="#0066cc" />
-                </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.mainArea}>
+          {currentWord && (
+            <>
+              <View style={styles.puzzle}>
+                {shuffledWord.map((letter, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.letter}
+                    onPress={() => handleLetterClick(letter)}
+                  >
+                    <Text style={styles.letterText}>{letter}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-            )}
-          </>
-        )}
-      </ScrollView>
-      <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={handleReplay} style={styles.button}>
-          <Text>Replay</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-          <Text>Submit</Text>
-        </TouchableOpacity>
-        <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} message={popupMessage} />
+              <View style={styles.placeholders}>
+                {answer.map((letter, index) => (
+                  <TouchableOpacity key={index} style={styles.placeholder}>
+                    <Text style={styles.placeholderText}>{letter}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity onPress={() => setShowHint(!showHint)} style={styles.hintButton}>
+                <Text style={styles.hintButtonText}>{showHint ? 'Hide Hint' : 'Show Hint'}</Text>
+              </TouchableOpacity>
+              {showHint && (
+                <View style={styles.hintsSection}>
+                  <Text style={styles.hintText}>Hint: {currentWord.hint}</Text>
+                  <TouchableOpacity onPress={playSound} style={styles.speakerIcon}>
+                    <Ionicons name="volume-high" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          )}
+        </ScrollView>
+        <View style={styles.bottomBar}>
+          <TouchableOpacity onPress={handleReplay} style={styles.button}>
+            <Text style={styles.buttonText}>Replay</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+          <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} message={popupMessage} />
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover', // 背景图覆盖整个屏幕
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // 半透明背景
   },
   topBar: {
     flexDirection: 'row',
@@ -242,15 +249,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    padding: 10,
+    padding: 15, // 让按钮更大
     backgroundColor: '#0066cc',
-    borderRadius: 5,
+    borderRadius: 12, // 让按钮更圆润
     alignItems: 'center',
+    minWidth: 100, // 让按钮更宽
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   scoreDisplay: {
     padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+  },
+  scoreText: {
+    fontSize: 16,
+    color: '#0066cc',
   },
   mainArea: {
     flex: 1,
@@ -261,17 +277,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 20,
+    justifyContent: 'center',
   },
   letter: {
     padding: 15,
     backgroundColor: '#ff8c00',
     borderRadius: 10,
     margin: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  letterText: {
+    fontSize: 18,
+    color: '#fff',
   },
   placeholders: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 20,
+    justifyContent: 'center',
   },
   placeholder: {
     width: 50,
@@ -284,16 +308,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 5,
   },
+  placeholderText: {
+    fontSize: 18,
+    color: '#0066cc',
+  },
+  hintButton: {
+    padding: 15,
+    backgroundColor: '#0066cc',
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  hintButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   hintsSection: {
     marginTop: 20,
-    padding: 10,
-    backgroundColor: '#fff',
+    padding: 15,
+    backgroundColor: 'rgba(0, 51, 102, 0.6)',
     borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
   },
+  hintText: {
+    fontSize: 19,
+    color: '#fff',
+    padding: 10,
+  },
   speakerIcon: {
     marginLeft: 10,
+    padding: 5,
   },
   bottomBar: {
     flexDirection: 'row',
