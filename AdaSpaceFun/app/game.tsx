@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // 使用 Ionicons 图标库
+import * as Speech from 'expo-speech'; // 导入 expo-speech
+import { Audio } from 'expo-av'; // 导入 expo-av 用于请求权限
 import Popup from './popup';
 
 interface Word {
@@ -54,6 +57,21 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   const [popupMessage, setPopupMessage] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
+
+  // 请求音频权限
+  useEffect(() => {
+    const requestPermissions = async () => {
+      await Audio.requestPermissionsAsync(); // 请求音频权限
+    };
+    requestPermissions();
+  }, []);
+
+  // 播放 Hint 句子
+  const playSound = () => {
+    if (currentWord) {
+      Speech.speak(currentWord.hint); // 播放 Hint 句子
+    }
+  };
 
   // Function to start the game
   const startGame = async () => {
@@ -190,6 +208,9 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
             {showHint && (
               <View style={styles.hintsSection}>
                 <Text>Hint: {currentWord.hint}</Text>
+                <TouchableOpacity onPress={playSound} style={styles.speakerIcon}>
+                  <Ionicons name="volume-high" size={24} color="#0066cc" />
+                </TouchableOpacity>
               </View>
             )}
           </>
@@ -268,6 +289,11 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  speakerIcon: {
+    marginLeft: 10,
   },
   bottomBar: {
     flexDirection: 'row',
