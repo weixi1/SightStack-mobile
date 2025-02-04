@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import axios, { get } from 'axios'; // 导入 axios
-import { useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from './usercontext'; // 导入 useUser
 
 interface Achievement {
   title: string;
@@ -11,17 +9,8 @@ interface Achievement {
   expanded?: boolean;
 }
 
-interface User {
-  name: string;
-  avatar: any; // 修改类型，适应 require 语法
-  age: number;
-  score: number;
-  achievements: string[];
-}
-
-const UserInfo: React.FC = () => {
-  const route = useRoute();
-  const [user, setUser] = useState<User | null>(null);
+const Account: React.FC = () => {
+  const { user, setUser } = useUser(); // 从 UserContext 中获取用户数据
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   // 所有成就列表
@@ -36,24 +25,6 @@ const UserInfo: React.FC = () => {
     { title: "🌠 Neptune Navigator", description: "You're navigating the deep oceans of games, just like Neptune rules the seas! 🌑🌊", unlocked: false },
     { title: "🏆 Solar System Champion", description: "Congratulations! You've obtained more than 300 points and earned your place as a true Game Master! 🚀🌟", unlocked: false }
   ];
-
-  // 使用 axios 获取用户数据
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        // 从路由参数获取 userId
-        const userJson = await AsyncStorage.getItem('user');
-        const data = userJson ? JSON.parse(userJson) as User : null;
-
-        // 假设 API 返回的数据符合预期
-        setUser(data);
-
-      } catch (error) {
-        console.error('Failed to load user:', error);
-      }
-    };
-    loadUser();
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -80,15 +51,14 @@ const UserInfo: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {user.name && (
+      {user.childName && (
         <View style={styles.profileContainer}>
           <View style={styles.profileHeader}>
             <View style={styles.avatar}>
-              <Image source={user.avatar} style={styles.avatarImage} />
+              <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
             </View>
             <View style={styles.profileInfo}>
-              <Text style={styles.name}>{user.name}</Text>
-              <Text style={styles.age}>Age: {user.age}</Text>
+              <Text style={styles.name}>{user.childName}</Text>
               <Text style={styles.score}>Total Score: <Text style={styles.bold}>{user.score}</Text></Text>
             </View>
           </View>
@@ -220,4 +190,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserInfo;
+export default Account;

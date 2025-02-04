@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, useRouter } from 'expo-router';
 import Popup from './popup';
-import UserInfo from './account';
+import { useUser } from './usercontext';
 
 
 const LogIn: React.FC = () => {
@@ -12,6 +12,7 @@ const LogIn: React.FC = () => {
     const navigation = useNavigation();
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
+    const { setUser } = useUser(); 
 
     const handleClose = () => {
         navigation.goBack();
@@ -34,16 +35,7 @@ const LogIn: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login successful:', data);
-                await AsyncStorage.setItem('user', JSON.stringify(data.user));
-
-                const storedUser = await AsyncStorage.getItem('user');
-                if (storedUser) {
-                    try {
-                        console.log('User data retrieved from AsyncStorage:', JSON.parse(storedUser));
-                    } catch (e) {
-                        console.error('Error parsing stored user data:', e);
-                    }
-                }
+                setUser(data.user);
 
                 // 显示成功的 Popup
                 setPopupMessage('Login successful!');
@@ -51,7 +43,7 @@ const LogIn: React.FC = () => {
                 // 2 秒后跳转到主页
                 setTimeout(() => {
                     setShowPopup(false);
-                    navigation.navigate('index');
+                    router.push('/');
             }, 2000);
             } else {
                 const errorData = await response.json();
