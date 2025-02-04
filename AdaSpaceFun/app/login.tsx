@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Popup from './popup';
+import UserInfo from './account';
 
 const LogIn: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -31,15 +33,15 @@ const LogIn: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login successful:', data);
-                localStorage.setItem('userId', data.userId); 
+                await AsyncStorage.setItem('user', JSON.stringify(data.user));
 
                 // 显示成功的 Popup
                 setPopupMessage('Login successful!');
                 setShowPopup(true);
                 // 2 秒后跳转到主页
                 setTimeout(() => {
-                setShowPopup(false);
-                navigation.navigate('index');
+                    setShowPopup(false);
+                    navigation.navigate('account', { user: data.user });
             }, 2000);
             } else {
                 const errorData = await response.json();
@@ -54,6 +56,8 @@ const LogIn: React.FC = () => {
         }
         console.log('Sending login request:', { email, password });
     };
+
+    
 
     return (
         <View style={styles.container}>

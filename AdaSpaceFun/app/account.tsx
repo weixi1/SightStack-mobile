@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
 interface Achievement {
   title: string;
@@ -18,9 +19,9 @@ interface User {
 }
 
 const UserInfo: React.FC = () => {
+  const route = useRoute();
   const [user, setUser] = useState<User | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const navigation = useNavigation();
 
   // 所有成就列表
   const allAchievements: Achievement[] = [
@@ -35,33 +36,32 @@ const UserInfo: React.FC = () => {
     { title: "🏆 Solar System Champion", description: "Congratulations! You've obtained more than 300 points and earned your place as a true Game Master! 🚀🌟", unlocked: false }
   ];
 
-  // 模拟用户信息
-  const mockUser: User = {
-    name: "John Doe",
-    avatar: require('@/assets/images/avatar0.jpg'), // 修正头像加载问题
-    age: 7,
-    score: 320,
-    achievements: ["🌑 Mercury Explorer", "🏆 Solar System Champion"],
-  };
-
-  // 模拟获取用户信息
+  // 更新成就解锁状态
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      setTimeout(() => {
-        setUser(mockUser);
-
-        // 更新成就解锁状态
-        const updatedAchievements = allAchievements.map(achievement => ({
-          ...achievement,
-          unlocked: mockUser.achievements.includes(achievement.title),
-          expanded: false, // 额外添加一个状态控制展开
-        }));
-        setAchievements(updatedAchievements);
-      }, 1000);
+    const loadUser = async () => {
+      try {
+        const userData = route.params?.user || (await AsyncStorage.getItem('user'));
+        if (userData) {
+          const parsedUser = typeof userData === 'string' ? JSON.parse(userData) : userData;
+          setUser(parsedUser);
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error);
+      }
     };
+    loadUser();
+  }, [route.params?.user]);
 
-    fetchUserInfo();
-  }, []);
+  useEffect(() => {
+    if (user) {
+      const updatedAchievements = allAchievements.map(achievement => ({
+        ...achievement,
+        unlocked: user.achievements.includes(achievement.title),
+        expanded: false, // 额外添加一个状态控制展开
+      }));
+      setAchievements(updatedAchievements);
+    }
+  }, [user]);
 
   // 切换描述的显示
   const toggleDescription = (index: number) => {
