@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Popup from './popup';
 
 const LogIn: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
 
     const handleClose = () => {
         navigation.goBack();
@@ -30,16 +33,24 @@ const LogIn: React.FC = () => {
                 console.log('Login successful:', data);
                 localStorage.setItem('userId', data.userId); 
 
-                // 直接跳转到主页
-                navigation.navigate('Home'); 
+                // 显示成功的 Popup
+                setPopupMessage('Login successful!');
+                setShowPopup(true);
+                // 2 秒后跳转到主页
+                setTimeout(() => {
+                setShowPopup(false);
+                navigation.navigate('index');
+            }, 2000);
             } else {
                 const errorData = await response.json();
                 console.error('Login failed:', errorData.error);
-                // 这里可以替换为其他的错误处理方式，比如显示一个Toast消息
+                setPopupMessage(errorData.error || 'Login failed');
+                setShowPopup(true);
             }
         } catch (error) {
             console.error('Error during login:', error);
-            // 这里可以替换为其他的错误处理方式，比如显示一个Toast消息
+            setPopupMessage('An error occurred during login');
+            setShowPopup(true);
         }
         console.log('Sending login request:', { email, password });
     };
@@ -69,6 +80,7 @@ const LogIn: React.FC = () => {
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                 <Text style={styles.submitButtonText}>Login</Text>
             </TouchableOpacity>
+            <Popup isOpen={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
         </View>
     );
 };
