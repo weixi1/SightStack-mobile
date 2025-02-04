@@ -17,7 +17,7 @@ const Leaderboard: React.FC = () => {
   const fetchLeaderboard = async () => {
     try {
       // Replace with your actual API endpoint
-      const response = await axios.get<User[]>('http://localhost:5000/leaderboard');
+      const response = await axios.get<User[]>('https://sightstack-back-end.onrender.com/leaderboard');
       
       // Set the fetched data to state
       setLeaderboardData(response.data);

@@ -20,7 +20,7 @@ const LogIn: React.FC = () => {
     const handleSubmit = async () => {
         // 发送登录请求到后端
         try {
-            const response = await fetch('http://localhost:5000/login', {
+            const response = await fetch('https://sightstack-back-end.onrender.com/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ const LogIn: React.FC = () => {
                 // 2 秒后跳转到主页
                 setTimeout(() => {
                     setShowPopup(false);
-                    navigation.navigate('account', { user: data.user });
+                    navigation.navigate('index');
             }, 2000);
             } else {
                 const errorData = await response.json();

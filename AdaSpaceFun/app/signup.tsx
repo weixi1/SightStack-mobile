@@ -44,7 +44,7 @@ const SignUp = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('https://sightstack-back-end.onrender.com/register', {
         childName,
         childAge: Number(childAge),
         email,

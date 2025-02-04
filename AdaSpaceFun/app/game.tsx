@@ -32,7 +32,7 @@ const gradeToLevel = (grade: string): string => {
   }
 };
 
-const apiServer = 'http://127.0.0.1:5000'; // Flask 后端地址
+const apiServer = 'https://sightstack-back-end.onrender.com'; // Flask 后端地址
 
 const fetchOptions: RequestInit = {
   method: 'GET',
