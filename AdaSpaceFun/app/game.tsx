@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // 使用 Ionicons 图标库
 import * as Speech from 'expo-speech'; // 导入 expo-speech
@@ -232,10 +232,14 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   );
 };
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover', // 背景图覆盖整个屏幕
+    width: screenWidth,
+    height: screenHeight,
+    resizeMode: 'cover', 
   },
   container: {
     flex: 1,

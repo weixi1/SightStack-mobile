@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     padding: 25, 
-    width: '80%', // 适配不同屏幕
     borderRadius: 15, // 更圆润
     alignItems: 'center',
     shadowColor: '#000', // 添加阴影
