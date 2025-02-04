@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios, { get } from 'axios'; // 导入 axios
 import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Achievement {
   title: string;
@@ -36,21 +37,23 @@ const UserInfo: React.FC = () => {
     { title: "🏆 Solar System Champion", description: "Congratulations! You've obtained more than 300 points and earned your place as a true Game Master! 🚀🌟", unlocked: false }
   ];
 
-  // 更新成就解锁状态
+  // 使用 axios 获取用户数据
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userData = route.params?.user || (await AsyncStorage.getItem('user'));
-        if (userData) {
-          const parsedUser = typeof userData === 'string' ? JSON.parse(userData) : userData;
-          setUser(parsedUser);
-        }
+        // 从路由参数获取 userId
+        const userJson = await AsyncStorage.getItem('user');
+        const data = userJson ? JSON.parse(userJson) as User : null;
+
+        // 假设 API 返回的数据符合预期
+        setUser(data);
+
       } catch (error) {
         console.error('Failed to load user:', error);
       }
     };
     loadUser();
-  }, [route.params?.user]);
+  }, []);
 
   useEffect(() => {
     if (user) {

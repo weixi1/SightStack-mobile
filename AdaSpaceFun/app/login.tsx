@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Popup from './popup';
 import UserInfo from './account';
 
+
 const LogIn: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -34,6 +35,15 @@ const LogIn: React.FC = () => {
                 const data = await response.json();
                 console.log('Login successful:', data);
                 await AsyncStorage.setItem('user', JSON.stringify(data.user));
+
+                const storedUser = await AsyncStorage.getItem('user');
+                if (storedUser) {
+                    try {
+                        console.log('User data retrieved from AsyncStorage:', JSON.parse(storedUser));
+                    } catch (e) {
+                        console.error('Error parsing stored user data:', e);
+                    }
+                }
 
                 // 显示成功的 Popup
                 setPopupMessage('Login successful!');

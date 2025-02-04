@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import axios from 'axios'; // Import axios
 
 // Define the type for user data
 interface User {
@@ -12,28 +13,24 @@ const Leaderboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Simulated data for testing
+  // Fetch leaderboard data from the backend
   const fetchLeaderboard = async () => {
     try {
-      // Simulated fetch request with dummy data
-      const simulatedData: User[] = [
-        { childName: 'John', score: 150 },
-        { childName: 'Alice', score: 120 },
-        { childName: 'Bob', score: 100 },
-        { childName: 'Charlie', score: 80 },
-        { childName: 'Lily', score: 50 },
-        { childName: 'Joe', score: 10 },
-        { childName: 'Anna', score: 0 },
-      ];
-      setLeaderboardData(simulatedData);
+      // Replace with your actual API endpoint
+      const response = await axios.get<User[]>('http://localhost:5000/leaderboard');
+      
+      // Set the fetched data to state
+      setLeaderboardData(response.data);
     } catch (err) {
+      // Handle errors
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
+      // Set loading to false after the request is complete
       setLoading(false);
     }
   };
 
-  // Component mount, simulate API call
+  // Fetch data when the component mounts
   useEffect(() => {
     fetchLeaderboard();
   }, []);
@@ -69,6 +66,7 @@ const Leaderboard: React.FC = () => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

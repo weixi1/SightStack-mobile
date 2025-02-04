@@ -2,6 +2,8 @@ import { Colors } from "@/constants/Colors";
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import Popup from './popup';
 
 const SignUp = () => {
   const [childName, setChildName] = useState('');
@@ -10,17 +12,19 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const avatars = [
-    require('@/assets/images/avatar0.jpg'),
-    require('@/assets/images/avatar1.jpg'),
-    require('@/assets/images/avatar2.jpg'),
-    require('@/assets/images/avatar3.jpg'),
-    require('@/assets/images/avatar4.jpg'),
-    require('@/assets/images/avatar5.jpg'),
-    require('@/assets/images/avatar6.jpg'),
-    require('@/assets/images/avatar8.jpg'),
-    require('@/assets/images/avatar9.jpg'),
+    require('https://i.ibb.co/jmH8r5g/avatar0.jpg'),
+    require('https://i.ibb.co/WvRgFxbd/avatar1.jpg'),
+    require('https://i.ibb.co/Swn05jYX/avatar2.jpg'),
+    require('https://i.ibb.co/5hwc44ZP/avatar3.jpg'),
+    require('https://i.ibb.co/GzxyRcK/avatar4.jpg'),
+    require('https://i.ibb.co/cS3S1kyv/avatar5.jpg'),
+    require('https://i.ibb.co/Fk61BdrT/avatar6.jpg'),
+    require('https://i.ibb.co/hFv9vsc9/avatar8.jpg'),
+    require('https://i.ibb.co/zVk7b91j/avatar9.jpg'),
   ];
 
   const validatePassword = (password) => password.length >= 6;
@@ -29,28 +33,36 @@ const SignUp = () => {
 
   const handleSaveProfile = async () => {
     if (!childName || !childAge || !selectedAvatar || !email || !password) {
+      setPopupMessage('Please fill in all fields');
+      setShowPopup(true);
       return;
     }
     if (!validateEmail(email) || !validatePassword(password) || !validateAge(Number(childAge))) {
+      setPopupMessage('Please enter valid email, password, and age');
+      setShowPopup(true);
       return;
     }
 
     try {
       const response = await axios.post('http://localhost:5000/register', {
         childName,
-        childAge,
+        childAge: Number(childAge),
         email,
         password,
         avatar: selectedAvatar,
       });
 
       if (response.status === 201) {
+        setPopupMessage('Profile saved successfully!');
+        setShowPopup(true);
         setTimeout(() => {
-          navigation.navigate('Home');
+          navigation.navigate('index');
         }, 2000);
       }
     } catch (error) {
       console.error('Error saving profile:', error);
+      setPopupMessage('Failed to save profile. Please try again.');
+      setShowPopup(true);
     }
   };
 
@@ -113,6 +125,7 @@ const SignUp = () => {
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
         <Text style={styles.saveButtonText}>Save Profile</Text>
+        <Popup isOpen={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
       </TouchableOpacity>
     </ScrollView>
   );
