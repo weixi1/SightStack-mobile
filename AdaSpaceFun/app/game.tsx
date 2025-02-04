@@ -18,22 +18,6 @@ interface GameProps {
   grade?: string; // Make grade optional
 }
 
-const wordLibrary: Word[] = [
-  { word: "and", hint: "Used to connect words or phrases", level: "prek" },
-  { word: "away", hint: "At a distance from a place or person", level: "prek" },
-  { word: "big", hint: "Large in size", level: "prek" },
-  { word: "cat", hint: "A small domesticated carnivorous mammal", level: "prek" },
-  { word: "dog", hint: "A domesticated carnivorous mammal, often kept as a pet", level: "prek" },
-  { word: "sun", hint: "The star at the center of our solar system", level: "prek" },
-  { word: "book", hint: "A set of written, printed, or blank pages", level: "prek" },
-  { word: "tree", hint: "A woody perennial plant, typically having a single stem or trunk", level: "prek" },
-  { word: "fish", hint: "A limbless cold-blooded vertebrate animal with gills", level: "prek" },
-  { word: "moon", hint: "The natural satellite of the Earth", level: "prek" },
-  { word: "star", hint: "A luminous point in the night sky", level: "prek" },
-  { word: "ball", hint: "A spherical object used in games and sports", level: "prek" },
-  { word: "bird", hint: "A warm-blooded egg-laying vertebrate animal with wings", level: "prek" },
-];
-
 const gradeToLevel = (grade: string): string => {
   switch (grade) {
     case 'pre-k': return 'prek';
@@ -45,6 +29,48 @@ const gradeToLevel = (grade: string): string => {
     case 'grade-5': return '5th';
     case 'grade-6': return '6th';
     default: return 'prek'; // Default to prek if grade is invalid
+  }
+};
+
+const apiServer = 'http://192.168.1.100:5000'; // Flask 后端地址
+
+const fetchOptions: RequestInit = {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
+
+const fetchWordByLevel = async (level: string): Promise<Word> => {
+  try {
+    const url = `${apiServer}/words/level/${level}`;
+    console.log('Fetching word for level:', level); // 打印请求的年级
+    console.log('Request URL:', url); // 打印请求的 URL
+
+    const response = await fetch(url, fetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch word for level ${level}`);
+    }
+
+    const wordData = await response.json(); // 获取返回的单词数据
+    console.log('Fetched word data:', wordData); // 打印返回的单词数据
+
+    return wordData;
+  } catch (err) {
+    console.error('Error fetching word:', err); // 打印错误信息
+    throw new Error('Error fetching word: ' + err);
+  }
+};
+
+const fetchDailyWord = async (): Promise<Word> => {
+  try {
+    const response = await fetch(`${apiServer}/words/daily`, fetchOptions);
+    if (!response.ok) {
+      throw new Error('Failed to fetch daily word');
+    }
+    return await response.json();
+  } catch (err) {
+    throw new Error('Error fetching daily word: ' + err);
   }
 };
 
@@ -80,23 +106,17 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
       let randomWord: Word;
 
       if (type === 'daily') {
-        // Randomly select a word from the wordLibrary for daily game
-        randomWord = wordLibrary[Math.floor(Math.random() * wordLibrary.length)];
+        // 调用 Flask 后端获取每日单词
+        randomWord = await fetchDailyWord();
       } else if (type === 'grade') {
-        // Ensure grade is provided for grade-based game
+        // 确保 grade 已经提供
         if (!grade) {
           throw new Error('Grade is required for grade-based game');
         }
 
-        // Filter words based on the grade level
+        // 调用 Flask 后端根据等级获取单词
         const level = gradeToLevel(grade);
-        const filteredWords = wordLibrary.filter(word => word.level === level);
-
-        if (filteredWords.length === 0) {
-          throw new Error(`No words found for grade: ${grade}`);
-        }
-
-        randomWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
+        randomWord = await fetchWordByLevel(level);
       } else {
         throw new Error('Invalid game type');
       }

@@ -45,9 +45,9 @@ const styles = StyleSheet.create({
     fontSize: 24, // 大一点
     color: '#8a2be2', // 紫色
     textAlign: 'center',
-    textShadowColor: '#abccee', // 阴影效果
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
+    // textShadowColor: '#abccee', // 阴影效果
+    // textShadowOffset: { width: 2, height: 2 },
+    // textShadowRadius: 4,
     marginBottom: 10,
     padding: 10,
   },
