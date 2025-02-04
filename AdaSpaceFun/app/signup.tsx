@@ -16,15 +16,15 @@ const SignUp = () => {
   const [popupMessage, setPopupMessage] = useState('');
 
   const avatars = [
-    require('https://i.ibb.co/jmH8r5g/avatar0.jpg'),
-    require('https://i.ibb.co/WvRgFxbd/avatar1.jpg'),
-    require('https://i.ibb.co/Swn05jYX/avatar2.jpg'),
-    require('https://i.ibb.co/5hwc44ZP/avatar3.jpg'),
-    require('https://i.ibb.co/GzxyRcK/avatar4.jpg'),
-    require('https://i.ibb.co/cS3S1kyv/avatar5.jpg'),
-    require('https://i.ibb.co/Fk61BdrT/avatar6.jpg'),
-    require('https://i.ibb.co/hFv9vsc9/avatar8.jpg'),
-    require('https://i.ibb.co/zVk7b91j/avatar9.jpg'),
+    'https://i.ibb.co/jmH8r5g/avatar0.jpg',
+    'https://i.ibb.co/WvRgFxbd/avatar1.jpg',
+    'https://i.ibb.co/Swn05jYX/avatar2.jpg',
+    'https://i.ibb.co/5hwc44ZP/avatar3.jpg',
+    'https://i.ibb.co/GzxyRcK/avatar4.jpg',
+    'https://i.ibb.co/cS3S1kyv/avatar5.jpg',
+    'https://i.ibb.co/Fk61BdrT/avatar6.jpg',
+    'https://i.ibb.co/hFv9vsc9/avatar8.jpg',
+    'https://i.ibb.co/zVk7b91j/avatar9.jpg',
   ];
 
   const validatePassword = (password) => password.length >= 6;
