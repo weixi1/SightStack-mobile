@@ -74,6 +74,29 @@ const fetchDailyWord = async (): Promise<Word> => {
   }
 };
 
+const updateUserScore = async (userId: string, score: number) => {
+  try {
+    const response = await fetch(`${apiServer}/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, score }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user score');
+    }
+
+    const result = await response.json();
+    console.log('Score updated successfully:', result);
+    return result;
+  } catch (err) {
+    console.error('Error updating user score:', err);
+    throw new Error('Error updating user score: ' + err);
+  }
+};
+
 const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
@@ -84,6 +107,7 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   const [popupMessage, setPopupMessage] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [userId, setUserId] = useState(''); // 假设你已经从某个地方获取了 userId
 
   // 请求音频权限
   useEffect(() => {
@@ -151,10 +175,19 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   // Function to handle submission
   const handleSubmit = async () => {
     if (currentWord && answer.join('') === currentWord.word) {
-      setScore(score + 1);
+      const newScore = score + 1;
+      setScore(newScore);
       setIsCompleted(true);
       setPopupMessage('Correct!');
       setIsPopupOpen(true);
+
+      // 更新用户积分到后端
+      try {
+        await updateUserScore(userId, newScore);
+      } catch (err) {
+        console.error('Failed to update score:', err);
+      }
+
       setTimeout(() => {
         startGame();
         setIsPopupOpen(false);

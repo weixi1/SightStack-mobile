@@ -8,7 +8,7 @@ import Popup from './popup';
 const SignUp = () => {
   const [childName, setChildName] = useState('');
   const [childAge, setChildAge] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
@@ -117,7 +117,7 @@ const SignUp = () => {
               ]}
               onPress={() => setSelectedAvatar(avatar)}
             >
-              <Image source={avatar} style={styles.avatarImage} />
+              <Image source={{ uri: avatar }} style={styles.avatarImage} />
             </TouchableOpacity>
           ))}
         </View>
