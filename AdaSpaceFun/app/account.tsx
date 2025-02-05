@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native';
 import { useUser } from './usercontext'; // 导入 useUser
 
 interface Achievement {
@@ -12,6 +12,7 @@ interface Achievement {
 const Account: React.FC = () => {
   const { user, setUser } = useUser(); // 从 UserContext 中获取用户数据
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // 所有成就列表
   const allAchievements: Achievement[] = [
@@ -34,6 +35,8 @@ const Account: React.FC = () => {
         expanded: false, // 额外添加一个状态控制展开
       }));
       setAchievements(updatedAchievements);
+    } else {
+      setShowLoginModal(true); // 如果没有用户信息，显示登录弹出窗口
     }
   }, [user]);
 
@@ -45,13 +48,14 @@ const Account: React.FC = () => {
     setAchievements(updatedAchievements);
   };
 
-  if (!user) {
-    return <Text style={styles.loadingText}>Loading...</Text>;
-  }
+  const handleLogin = () => {
+    // 这里可以添加导航到登录页面的逻辑
+    setShowLoginModal(false);
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {user.childName && (
+      {user ? (
         <View style={styles.profileContainer}>
           <View style={styles.profileHeader}>
             <View style={styles.avatar}>
@@ -83,6 +87,20 @@ const Account: React.FC = () => {
             </View>
           </View>
         </View>
+      ) : (
+        <Modal
+          visible={showLoginModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowLoginModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Please login to view your account.</Text>
+              <Button title="Close" onPress={handleLogin} />
+            </View>
+          </View>
+        </Modal>
       )}
     </ScrollView>
   );
@@ -187,6 +205,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: '#fff',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
 
