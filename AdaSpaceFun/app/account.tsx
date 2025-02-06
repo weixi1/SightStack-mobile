@@ -12,6 +12,7 @@ interface Achievement {
 interface User {
   avatar: string;
   childName: string;
+  childAge: number;
   score: number;
   userId: number;
   achievements: Achievement[]; // 添加 achievements 字段
@@ -21,6 +22,8 @@ const Account: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const apiServer = 'https://sightstack-back-end.onrender.com';
 
   // 所有成就列表
   const allAchievements: Achievement[] = [
@@ -51,20 +54,40 @@ const Account: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user && user.userId) {
+        try {
+          // 发送 GET 请求获取用户详细信息
+          const response = await fetch(`${apiServer}/userInfo?userId=${user.userId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setUser({
+              avatar: data.avatar,
+              childName: data.childName,
+              childAge: data.childAge,
+              score: data.score,
+              userId: data.userId,
+              achievements: data.achievements,
+            });
 
-    console.log('User data:', user);
+            // 更新成就信息
+            const updatedAchievements = allAchievements.map(achievement => ({
+              ...achievement,
+              unlocked: data.achievements.includes(achievement.title),
+              expanded: false, // 额外添加一个状态控制展开
+            }));
+            setAchievements(updatedAchievements);
+          } else {
+            console.error('Failed to fetch user info');
+          }
+        } catch (error) {
+          console.error('Error fetching user data', error);
+        }
+      }
+    };
 
-    if (user) {
-      const updatedAchievements = allAchievements.map(achievement => ({
-        ...achievement,
-        unlocked: user.achievements.includes(achievement.title),
-        expanded: false, // 额外添加一个状态控制展开
-      }));
-      setAchievements(updatedAchievements);
-    } else {
-      setShowLoginModal(true); // 如果没有用户信息，显示登录弹出窗口
-    }
-  }, [user]);
+    fetchUserInfo();
+  }, [user]); // 只有当 user 信息发生变化时才会触发此请求
 
   // 切换描述的显示
   const toggleDescription = (index: number) => {
