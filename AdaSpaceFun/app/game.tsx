@@ -159,22 +159,34 @@ const Game: React.FC = () => {
 
   const handleSubmit = async () => {
     if (currentWord && answer.join('') === currentWord.word) {
-      const newScore = 1;
+      const newScore = score + 1; 
       setScore(newScore);
       setIsCompleted(true);
       setPopupMessage('Correct!');
       setIsPopupOpen(true);
 
       try {
-        if (userId) {
-          await updateUserScore(userId, newScore);
-        } else {
-          console.error('No userId found');
+        const response = await fetch(`${apiServer}/update`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: userId, // 当前用户的ID
+            score: 1, // 每次加1分
+          }),
+        });
+  
+        // 检查请求是否成功
+        if (!response.ok) {
+          throw new Error('Failed to update score');
         }
-      } catch (err) {
-        console.error('Failed to update score:', err);
-        setPopupMessage('Failed to update score');
-        setIsPopupOpen(true);
+  
+        // 解析后端返回的数据
+        const result = await response.json();
+        console.log(result.message); // 打印后端返回的消息
+      } catch (error) {
+        console.error('Error updating score:', error); // 捕获并打印错误
       }
 
       setTimeout(() => {
