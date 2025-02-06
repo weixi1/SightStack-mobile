@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native';
-import { useUser } from './usercontext'; // 导入 useUser
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Achievement {
   title: string;
@@ -9,8 +9,16 @@ interface Achievement {
   expanded?: boolean;
 }
 
+interface User {
+  avatar: string;
+  childName: string;
+  score: number;
+  userId: number;
+  achievements: Achievement[]; // 添加 achievements 字段
+}
+
 const Account: React.FC = () => {
-  const { user, setUser } = useUser(); // 从 UserContext 中获取用户数据
+  const [user, setUser] = useState<User | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -28,6 +36,24 @@ const Account: React.FC = () => {
   ];
 
   useEffect(() => {
+    // 从 AsyncStorage 获取用户数据
+    const fetchUserData = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser); // 更新状态
+      } else {
+        setShowLoginModal(true); // 如果没有用户数据，显示登录弹出窗口
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+
+    console.log('User data:', user);
+
     if (user) {
       const updatedAchievements = allAchievements.map(achievement => ({
         ...achievement,

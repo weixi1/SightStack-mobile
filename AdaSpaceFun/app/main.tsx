@@ -26,8 +26,8 @@ const MainHome: React.FC = () => {
   };
 
   const navigateToGame = (grade: string) => {
-    router.push({ pathname: '/game', params: { grade } }); // 导航到游戏页面并传递参数
-  };
+  router.push({ pathname: '/game', params: { type: 'grade', grade } }); 
+};
 
   return (
     <ImageBackground source={require('@/assets/images/background.jpg')} style={styles.background}>

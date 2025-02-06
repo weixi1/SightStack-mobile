@@ -4,7 +4,19 @@ import { useNavigation } from '@react-navigation/native';
 import { router, useRouter } from 'expo-router';
 import Popup from './popup';
 import { useUser } from './usercontext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const storeUserId = async (userId: number) => {
+    try {
+        await AsyncStorage.setItem('userId', userId.toString());
+    } catch (error) {
+        console.error('Error storing user ID:', error);
+    }
+
+    // 读取并打印存储的用户 ID，确认存储成功
+    const storedUserId = await AsyncStorage.getItem('userId');
+    console.log("✅: Retrieved User ID from AsyncStorage:", storedUserId);
+};
 
 const LogIn: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -27,24 +39,36 @@ const LogIn: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: email,
-                    password: password,
+                    email,
+                    password,
                 }),
             });
 
             if (response.ok) {
                 const data = await response.json();
                 console.log('Login successful:', data);
-                setUser(data.user);
+
+                setUser(data);
+
+                // 调用 storeUserId 函数存储 user_id 到 AsyncStorage
+                // if (data.userId) {
+                //     await storeUserId(data.userId); // 确保存储操作完成
+                // }
+
+                if (data) {
+                    await AsyncStorage.setItem('user', JSON.stringify(data)); // 存储完整的用户数据
+                    await storeUserId(data.userId); // 如果只需要存储 userId，也可以单独存储
+                }
 
                 // 显示成功的 Popup
                 setPopupMessage('Login successful!');
                 setShowPopup(true);
-                // 2 秒后跳转到主页
+
+                // 2 秒后跳转到主页，确保异步操作已经完成
                 setTimeout(() => {
                     setShowPopup(false);
                     router.push('/');
-            }, 2000);
+                }, 2000);
             } else {
                 const errorData = await response.json();
                 console.error('Login failed:', errorData.error);
@@ -58,8 +82,6 @@ const LogIn: React.FC = () => {
         }
         console.log('Sending login request:', { email, password });
     };
-
-    
 
     return (
         <View style={styles.container}>

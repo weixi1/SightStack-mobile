@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ImageBackground } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // 使用 Ionicons 图标库
-import * as Speech from 'expo-speech'; // 导入 expo-speech
-import { Audio } from 'expo-av'; // 导入 expo-av 用于请求权限
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech';
+import { Audio } from 'expo-av';
 import Popup from './popup';
-import background from '@/assets/images/background.jpg'; // 导入背景图
+import background from '@/assets/images/background.jpg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Word {
   word: string;
   hint: string;
   level: string;
-}
-
-interface GameProps {
-  type?: 'daily' | 'grade'; // Make type optional with default value
-  grade?: string; // Make grade optional
 }
 
 const gradeToLevel = (grade: string): string => {
@@ -32,7 +28,7 @@ const gradeToLevel = (grade: string): string => {
   }
 };
 
-const apiServer = 'https://sightstack-back-end.onrender.com'; // Flask 后端地址
+const apiServer = 'https://sightstack-back-end.onrender.com';
 
 const fetchOptions: RequestInit = {
   method: 'GET',
@@ -43,21 +39,13 @@ const fetchOptions: RequestInit = {
 
 const fetchWordByLevel = async (level: string): Promise<Word> => {
   try {
-    const url = `${apiServer}/words/level/${level}`;
-    console.log('Fetching word for level:', level); // 打印请求的年级
-    console.log('Request URL:', url); // 打印请求的 URL
-
-    const response = await fetch(url, fetchOptions);
+    const response = await fetch(`${apiServer}/words/level/${level}`, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch word for level ${level}`);
     }
-
-    const wordData = await response.json(); // 获取返回的单词数据
-    console.log('Fetched word data:', wordData); // 打印返回的单词数据
-
-    return wordData;
+    return await response.json();
   } catch (err) {
-    console.error('Error fetching word:', err); // 打印错误信息
+    console.error('Error fetching word:', err);
     throw new Error('Error fetching word: ' + err);
   }
 };
@@ -84,21 +72,22 @@ const updateUserScore = async (userId: string, score: number) => {
       body: JSON.stringify({ userId, score }),
     });
 
+    const result = await response.json();
     if (!response.ok) {
-      throw new Error('Failed to update user score');
+      throw new Error(result.message || 'Failed to update user score');
     }
 
-    const result = await response.json();
     console.log('Score updated successfully:', result);
     return result;
   } catch (err) {
     console.error('Error updating user score:', err);
-    throw new Error('Error updating user score: ' + err);
+    throw err;
   }
 };
 
-const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
+const Game: React.FC = () => {
   const router = useRouter();
+  const { type = 'daily', grade = '' } = useLocalSearchParams();
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [shuffledWord, setShuffledWord] = useState<string[]>([]);
   const [answer, setAnswer] = useState<string[]>([]);
@@ -107,48 +96,58 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
   const [popupMessage, setPopupMessage] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
-  const [userId, setUserId] = useState(''); // 假设你已经从某个地方获取了 userId
+  const [userId, setUserId] = useState('');
 
-  // 请求音频权限
   useEffect(() => {
     const requestPermissions = async () => {
-      await Audio.requestPermissionsAsync(); // 请求音频权限
+      await Audio.requestPermissionsAsync();
     };
     requestPermissions();
   }, []);
 
-  // 播放 Hint 句子
-  const playSound = () => {
-    if (currentWord) {
-      Speech.speak(currentWord.hint); // 播放 Hint 句子
+  useEffect(() => {
+    const getUserId = async () => {
+      const savedUserId = await AsyncStorage.getItem('userId');
+      if (savedUserId) {
+        setUserId(savedUserId);
+      } else {
+        const generatedUserId = `user-${Math.floor(Math.random() * 10000)}`;
+        await saveUserId(generatedUserId);
+      }
+    };
+    getUserId();
+  }, []);
+
+  const saveUserId = async (userId: string) => {
+    try {
+      await AsyncStorage.setItem('userId', userId);
+      setUserId(userId);
+    } catch (error) {
+      console.error('Failed to save userId:', error);
     }
   };
 
-  // Function to start the game
+  const playSound = () => {
+    if (currentWord) {
+      Speech.speak(currentWord.hint);
+    }
+  };
+
   const startGame = async () => {
     try {
       let randomWord: Word;
-
       if (type === 'daily') {
-        // 调用 Flask 后端获取每日单词
         randomWord = await fetchDailyWord();
-      } else if (type === 'grade') {
-        // 确保 grade 已经提供
-        if (!grade) {
-          throw new Error('Grade is required for grade-based game');
-        }
-
-        // 调用 Flask 后端根据等级获取单词
+      } else if (type === 'grade' && grade) {
         const level = gradeToLevel(grade);
         randomWord = await fetchWordByLevel(level);
       } else {
-        throw new Error('Invalid game type');
+        throw new Error('Invalid game type or missing grade');
       }
 
       setCurrentWord(randomWord);
-      const shuffled = shuffleArray(randomWord.word.split(''));
-      setShuffledWord(shuffled);
-      setAnswer(Array(shuffled.length).fill(''));
+      setShuffledWord(shuffleArray(randomWord.word.split('')));
+      setAnswer(Array(randomWord.word.length).fill(''));
       setShowHint(false);
       setIsCompleted(false);
     } catch (err) {
@@ -158,21 +157,6 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
     }
   };
 
-  // Function to shuffle an array
-  const shuffleArray = (array: string[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-
-  // Function to reset the answer
-  const handleReplay = () => {
-    setAnswer(Array(answer.length).fill(''));
-  };
-
-  // Function to handle submission
   const handleSubmit = async () => {
     if (currentWord && answer.join('') === currentWord.word) {
       const newScore = score + 1;
@@ -181,11 +165,16 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
       setPopupMessage('Correct!');
       setIsPopupOpen(true);
 
-      // 更新用户积分到后端
       try {
-        await updateUserScore(userId, newScore);
+        if (userId) {
+          await updateUserScore(userId, newScore);
+        } else {
+          console.error('No userId found');
+        }
       } catch (err) {
         console.error('Failed to update score:', err);
+        setPopupMessage('Failed to update score');
+        setIsPopupOpen(true);
       }
 
       setTimeout(() => {
@@ -196,18 +185,20 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
       setPopupMessage('Try again!');
       setIsPopupOpen(true);
       setTimeout(() => {
-        handleReplay();
+        setAnswer(Array(answer.length).fill(''));
         setIsPopupOpen(false);
       }, 2000);
     }
   };
 
-  // Function to go back to the home screen
-  const goBackToHome = () => {
-    router.back();
+  const shuffleArray = (array: string[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   };
 
-  // Function to handle letter click
   const handleLetterClick = (letter: string) => {
     const emptyIndex = answer.findIndex((char) => char === '');
     if (emptyIndex !== -1) {
@@ -217,10 +208,9 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
     }
   };
 
-  // Start the game when the component mounts
-  useEffect(() => {
-    startGame();
-  }, [type, grade]);
+  const goBackToHome = () => {
+    router.push('/');
+  };
 
   return (
     <ImageBackground source={background} style={styles.background}>
@@ -272,7 +262,7 @@ const Game: React.FC<GameProps> = ({ type = 'daily', grade = '' }) => {
           )}
         </ScrollView>
         <View style={styles.bottomBar}>
-          <TouchableOpacity onPress={handleReplay} style={styles.button}>
+          <TouchableOpacity onPress={() => setAnswer(Array(answer.length).fill(''))} style={styles.button}>
             <Text style={styles.buttonText}>Replay</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSubmit} style={styles.button}>
