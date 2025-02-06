@@ -159,7 +159,7 @@ const Game: React.FC = () => {
 
   const handleSubmit = async () => {
     if (currentWord && answer.join('') === currentWord.word) {
-      const newScore = score + 1;
+      const newScore = 1;
       setScore(newScore);
       setIsCompleted(true);
       setPopupMessage('Correct!');
