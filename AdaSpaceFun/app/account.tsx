@@ -106,6 +106,12 @@ const Account: React.FC = () => {
     setLockedAchievement(achievement);
   };
 
+  const logout = async () => {
+    // 删除 AsyncStorage 中的用户数据
+    await AsyncStorage.removeItem('user');
+    setUser(null); // 清除用户状态
+  };
+
   const handleLogin = () => {
     // 这里可以添加导航到登录页面的逻辑
     setShowLoginModal(false);
@@ -177,6 +183,10 @@ const Account: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -299,6 +309,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  logoutButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#003366',
+  },
 });
+
 
 export default Account;
