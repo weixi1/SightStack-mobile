@@ -11,12 +11,15 @@ const app = () => {
         style={styles.image}
         >
         <Text style={styles.title}>AdaSpaceFun</Text>
+        <Text style={styles.suptitle}>Spelling Practice</Text>
         <View style={styles.buttonContainer}>
             <Link href="/rules" style={{marginHorizontal:'auto'}} asChild>
             <Pressable style={styles.button}>
                 <Text style={styles.buttonText}>Rules</Text>
             </Pressable>
             </Link>
+
+
 
             <Link href="/main" style={{marginHorizontal:'auto'}} asChild>
             <Pressable style={styles.button}>
@@ -73,6 +76,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 120,
     },
+
+    suptitle:{
+        fontSize: 18,
+        color: '#ccc',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 100,
+        marginTop: -100, 
+    },
+
     buttonContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
