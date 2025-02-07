@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Achievement {
   title: string;
   description: string;
+  required_score: number;
   unlocked: boolean;
   expanded?: boolean;
 }
@@ -27,15 +28,15 @@ const Account: React.FC = () => {
 
   // 所有成就列表
   const allAchievements: Achievement[] = [
-    { title: "🌑 Mercury Explorer", description: "Like the swift Mercury 🌕, you've taken your first steps in solving games! 🚀", unlocked: false },
-    { title: "🌟 Venus Voyager", description: "Your problem-solving is as radiant as Venus in the night sky 🌘. Great work on your games! 🌍", unlocked: false },
-    { title: "🌍 Earth Defender", description: "You've defended Earth 🌏 from the challenges of games. Keep it up! 🛡️", unlocked: false },
-    { title: "💫 Mars Adventurer", description: "Your adventurous spirit has led you to conquer the challenges of Mars! 🔴", unlocked: false },
-    { title: "🛸 Jupiter Giant", description: "Like Jupiter 🌑, your skills in games are gigantic! 💫", unlocked: false },
-    { title: "🪐 Saturn Strategist", description: "Your strategic mind has helped you solve the rings of challenges! 🪐", unlocked: false },
-    { title: "🌌 Uranus Innovator", description: "Your innovative solutions have made you a master of games! 🌟", unlocked: false },
-    { title: "🌠 Neptune Navigator", description: "You're navigating the deep oceans of games, just like Neptune rules the seas! 🌑🌊", unlocked: false },
-    { title: "🏆 Solar System Champion", description: "Congratulations! You've obtained more than 300 points and earned your place as a true Game Master! 🚀🌟", unlocked: false }
+    { title: "🌑 Mercury Explorer", description: "Like the swift Mercury 🌕, you've taken your first steps in solving games! 🚀", required_score: 10, unlocked: false },
+    { title: "🌟 Venus Voyager", description: "Your problem-solving is as radiant as Venus in the night sky 🌘. Great work on your games! 🌍", required_score: 30, unlocked: false },
+    { title: "🌍 Earth Defender", description: "You've defended Earth 🌏 from the challenges of games. Keep it up! 🛡️", required_score: 50, unlocked: false },
+    { title: "💫 Mars Adventurer", description: "Your adventurous spirit has led you to conquer the challenges of Mars! 🔴", required_score: 80, unlocked: false },
+    { title: "🛸 Jupiter Giant", description: "Like Jupiter 🌑, your skills in games are gigantic! 💫", required_score: 100, unlocked: false },
+    { title: "🪐 Saturn Strategist", description: "Your strategic mind has helped you solve the rings of challenges! 🪐", required_score: 150, unlocked: false },
+    { title: "🌌 Uranus Innovator", description: "Your innovative solutions have made you a master of games! 🌟", required_score: 200, unlocked: false },
+    { title: "🌠 Neptune Navigator", description: "You're navigating the deep oceans of games, just like Neptune rules the seas! 🌑🌊", required_score: 260, unlocked: false },
+    { title: "🏆 Solar System Champion", description: "Congratulations! You've obtained more than 300 points and earned your place as a true Game Master! 🚀🌟", required_score: 300, unlocked: false }
   ];
 
   useEffect(() => {
@@ -61,19 +62,20 @@ const Account: React.FC = () => {
           const response = await fetch(`${apiServer}/userInfo?userId=${user.userId}`);
           if (response.ok) {
             const data = await response.json();
-            setUser({
+            const updatedUser = {
               avatar: data.avatar,
               childName: data.childName,
               childAge: data.childAge,
               score: data.score,
               userId: data.userId,
               achievements: data.achievements,
-            });
+            };
+            setUser(updatedUser);
 
             // 更新成就信息
             const updatedAchievements = allAchievements.map(achievement => ({
               ...achievement,
-              unlocked: data.achievements.includes(achievement.title),
+              unlocked: updatedUser.score >= achievement.required_score,
               expanded: false, // 额外添加一个状态控制展开
             }));
             setAchievements(updatedAchievements);
