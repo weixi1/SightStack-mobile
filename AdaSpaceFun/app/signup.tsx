@@ -108,19 +108,19 @@ const SignUp = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Choose Avatar:</Text>
         <View style={styles.avatarContainer}>
-          {avatars.map((avatar, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.avatar,
-                selectedAvatar === avatar && styles.selectedAvatar,
-              ]}
-              onPress={() => setSelectedAvatar(avatar)}
-            >
-              <Image source={{ uri: avatar }} style={styles.avatarImage} />
-            </TouchableOpacity>
-          ))}
-        </View>
+        {avatars.map((avatar, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.avatar,
+              selectedAvatar === avatar && styles.selectedAvatar, // 如果选中了，应用选中样式
+            ]}
+            onPress={() => setSelectedAvatar(avatar)} // 点击时更新选中的头像
+          >
+            <Image source={{ uri: avatar }} style={styles.avatarImage} />
+          </TouchableOpacity>
+        ))}
+      </View>
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
@@ -185,7 +185,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedAvatar: {
-    borderColor: '#fff',
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
   },
   avatarImage: {
     width: '80%',

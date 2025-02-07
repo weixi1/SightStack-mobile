@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 interface Achievement {
   title: string;
@@ -113,7 +114,7 @@ const Account: React.FC = () => {
   };
 
   const handleLogin = () => {
-    // 这里可以添加导航到登录页面的逻辑
+    router.push('/');
     setShowLoginModal(false);
   };
 
