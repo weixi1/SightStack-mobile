@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
 import axios from 'axios'; // Import axios
 
 // Define the type for user data
 interface User {
   childName: string;
   score: number;
+  avatar: string;
 }
 
 const Leaderboard: React.FC = () => {
@@ -19,6 +20,8 @@ const Leaderboard: React.FC = () => {
       // Replace with your actual API endpoint
       const response = await axios.get<User[]>('https://sightstack-back-end.onrender.com/leaderboard');
       
+      console.log('Fetched leaderboard data:', response.data);
+
       // Set the fetched data to state
       setLeaderboardData(response.data);
     } catch (err) {
@@ -45,6 +48,7 @@ const Leaderboard: React.FC = () => {
     return <Text style={styles.error}>Error: {error}</Text>;
   }
 
+
   // Render leaderboard
   return (
     <View style={styles.container}>
@@ -52,15 +56,25 @@ const Leaderboard: React.FC = () => {
       <FlatList
         data={leaderboardData}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.item}>
-            <Text style={styles.medal}>
-              {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
-            </Text>
-            <Text style={styles.childName}>{item.childName}</Text>
-            <Text style={styles.score}>{item.score} points</Text>
-          </View>
-        )}
+        renderItem={({ item, index }) => {
+          // Log the avatar URL for debugging
+          console.log(`Avatar URL for ${item.childName}: ${item.avatar}`);
+
+          return (
+            <View style={styles.item}>
+              <Text style={styles.medal}>
+                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
+              </Text>
+              <Image
+                source={{ uri: item.avatar }} // Use the avatar URL to display the image
+                style={styles.avatar}
+                onError={(e) => console.log(`Failed to load image for ${item.childName}: ${e.nativeEvent.error}`)}
+              />
+              <Text style={styles.childName}>{item.childName}</Text>
+              <Text style={styles.score}>{item.score} points</Text>
+            </View>
+          );
+        }}
       />
     </View>
   );
@@ -115,6 +129,12 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 18,
     color: '#03045e',
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
   },
 });
 

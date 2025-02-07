@@ -112,6 +112,7 @@ const Account: React.FC = () => {
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.name}>{user.childName}</Text>
+              <Text style={styles.age}>Age: <Text style={styles.bold}>{user.childAge}</Text></Text>
               <Text style={styles.score}>Total Score: <Text style={styles.bold}>{user.score}</Text></Text>
             </View>
           </View>
