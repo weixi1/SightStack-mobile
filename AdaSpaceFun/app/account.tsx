@@ -24,6 +24,8 @@ const Account: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  const [lockedAchievement, setLockedAchievement] = useState<Achievement | null>(null);
+
   const apiServer = 'https://sightstack-back-end.onrender.com';
 
   // 所有成就列表
@@ -98,6 +100,11 @@ const Account: React.FC = () => {
     );
     setAchievements(updatedAchievements);
   };
+  
+  // 新增：处理点击未解锁成就时的提示
+  const handleLockedAchievementPress = (achievement: Achievement) => {
+    setLockedAchievement(achievement);
+  };
 
   const handleLogin = () => {
     // 这里可以添加导航到登录页面的逻辑
@@ -125,16 +132,21 @@ const Account: React.FC = () => {
             <View style={styles.achievements}>
               {achievements.map((achievement, index) => (
                 <TouchableOpacity
-                  key={index}
-                  style={[styles.achievement, achievement.unlocked ? styles.unlocked : styles.locked]}
-                  onPress={() => achievement.unlocked && toggleDescription(index)}
-                  disabled={!achievement.unlocked}
-                >
-                  <Text style={styles.achievementTitle}>{achievement.title}</Text>
-                  {achievement.unlocked && achievement.expanded && (
-                    <Text style={styles.achievementDescription}>{achievement.description}</Text>
-                  )}
-                </TouchableOpacity>
+                key={index}
+                style={[styles.achievement, achievement.unlocked ? styles.unlocked : styles.locked]}
+                onPress={() => {
+                  if (achievement.unlocked) {
+                    toggleDescription(index);
+                  } else {
+                    handleLockedAchievementPress(achievement);
+                  }
+                }}
+              >
+                <Text style={styles.achievementTitle}>{achievement.title}</Text>
+                {achievement.unlocked && achievement.expanded && (
+                  <Text style={styles.achievementDescription}>{achievement.description}</Text>
+                )}
+              </TouchableOpacity>
               ))}
             </View>
           </View>
@@ -154,6 +166,17 @@ const Account: React.FC = () => {
           </View>
         </Modal>
       )}
+      {/* 新增：未解锁成就提示弹窗 */}
+      <Modal visible={!!lockedAchievement} transparent={true} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              You need {lockedAchievement?.required_score} points to unlock🔓!
+            </Text>
+            <Button title="OK" onPress={() => setLockedAchievement(null)} />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
