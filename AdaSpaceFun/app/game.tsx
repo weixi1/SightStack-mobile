@@ -62,32 +62,32 @@ const fetchDailyWord = async (): Promise<Word> => {
   }
 };
 
-const updateUserScore = async (userId: string, score: number) => {
-  try {
-    const response = await fetch(`${apiServer}/update`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId, score }),
-    });
+// const updateUserScore = async (userId: string, score: number) => {
+//   try {
+//     const response = await fetch(`${apiServer}/update`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ userId, score }),
+//     });
 
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Failed to update user score');
-    }
+//     const result = await response.json();
+//     if (!response.ok) {
+//       throw new Error(result.message || 'Failed to update user score');
+//     }
 
-    console.log('Score updated successfully:', result);
-    return result;
-  } catch (err) {
-    console.error('Error updating user score:', err);
-    throw err;
-  }
-};
+//     console.log('Score updated successfully:', result);
+//     return result;
+//   } catch (err) {
+//     console.error('Error updating user score:', err);
+//     throw err;
+//   }
+// };
 
 const Game: React.FC = () => {
   const router = useRouter();
-  const { type = 'daily', grade = '' } = useLocalSearchParams();
+  const { type = 'daily', grade = '' } = useLocalSearchParams() as { type: string, grade: string };
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [shuffledWord, setShuffledWord] = useState<string[]>([]);
   const [answer, setAnswer] = useState<string[]>([]);
@@ -139,7 +139,7 @@ const Game: React.FC = () => {
       if (type === 'daily') {
         randomWord = await fetchDailyWord();
       } else if (type === 'grade' && grade) {
-        const level = gradeToLevel(grade);
+        const level = gradeToLevel(Array.isArray(grade) ? grade[0] : grade);
         randomWord = await fetchWordByLevel(level);
       } else {
         throw new Error('Invalid game type or missing grade');
