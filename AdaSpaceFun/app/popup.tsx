@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   popupMessage: {
     fontFamily: 'Comic Sans MS', // 可爱的字体
     fontSize: 24, // 大一点
-    color: '#8a2be2', // 紫色
+    color: '#007bff', 
     textAlign: 'center',
     // textShadowColor: '#abccee', // 阴影效果
     // textShadowOffset: { width: 2, height: 2 },

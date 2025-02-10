@@ -97,6 +97,7 @@ const Game: React.FC = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
   const [userId, setUserId] = useState('');
+  const [usedLetters, setUsedLetters] = useState<string[]>([]);
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -148,6 +149,7 @@ const Game: React.FC = () => {
       setCurrentWord(randomWord);
       setShuffledWord(shuffleArray(randomWord.word.split('')));
       setAnswer(Array(randomWord.word.length).fill(''));
+      setUsedLetters([]); 
       setShowHint(false);
       setIsCompleted(false);
     } catch (err) {
@@ -211,12 +213,13 @@ const Game: React.FC = () => {
     return array;
   };
 
-  const handleLetterClick = (letter: string) => {
+  const handleLetterClick = (letter: string, index: number) => {
     const emptyIndex = answer.findIndex((char) => char === '');
-    if (emptyIndex !== -1) {
+    if (emptyIndex !== -1 && !usedLetters.includes(index)) {
       const newAnswer = [...answer];
       newAnswer[emptyIndex] = letter;
       setAnswer(newAnswer);
+      setUsedLetters([...usedLetters, index]);
     }
   };
 
@@ -242,15 +245,21 @@ const Game: React.FC = () => {
           {currentWord && (
             <>
               <View style={styles.puzzle}>
-                {shuffledWord.map((letter, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.letter}
-                    onPress={() => handleLetterClick(letter)}
-                  >
-                    <Text style={styles.letterText}>{letter}</Text>
-                  </TouchableOpacity>
-                ))}
+                {shuffledWord.map((letter, index) => {
+                  const isUsed = usedLetters.includes(index); // 检查字母是否已被使用
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={[styles.letter, isUsed && styles.usedLetter]} // 根据是否使用过改变样式
+                      onPress={() => !isUsed && handleLetterClick(letter, index)} // 禁用已使用的字母
+                      disabled={isUsed} // 禁用已使用的字母
+                    >
+                      <Text style={[styles.letterText, isUsed && styles.usedLetterText]}>
+                        {letter}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
               <View style={styles.placeholders}>
                 {answer.map((letter, index) => (
@@ -407,6 +416,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  usedLetter: {
+    backgroundColor: '#ccc', // 已使用字母的背景色
+  },
+  usedLetterText: {
+    color: '#888', // 已使用字母的文字颜色
   },
 });
 
