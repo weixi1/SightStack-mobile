@@ -223,6 +223,11 @@ const Game: React.FC = () => {
     }
   };
 
+  const handleReplay = () => {
+    setAnswer(Array(answer.length).fill('')); // 重置 answer
+    setUsedLetters([]); // 重置 usedLetters
+  };
+
   const goBackToHome = () => {
     router.push('/');
   };
@@ -283,7 +288,7 @@ const Game: React.FC = () => {
           )}
         </ScrollView>
         <View style={styles.bottomBar}>
-          <TouchableOpacity onPress={() => setAnswer(Array(answer.length).fill(''))} style={styles.button}>
+          <TouchableOpacity onPress={handleReplay} style={styles.button}>
             <Text style={styles.buttonText}>Replay</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleSubmit} style={styles.button}>
